@@ -1,11 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ContestForm
 from .models import Contest
 
 
-def proposal(request):
-    form = ContestForm(request.POST or None)
+def proposal(request, pk=None):
+    """Функция добавления и редактирования заявки."""
+    if pk is not None:
+        instance = get_object_or_404(Contest, pk=pk)
+    else:
+        instance = None
+    form = ContestForm(request.POST or None, instance=instance)
     context = {'form': form}
     if form.is_valid():
         form.save()
@@ -13,6 +18,18 @@ def proposal(request):
 
 
 def proposal_list(request):
-    proposals = Contest.objects.all().order_by('id')
+    """Список заявок."""
+    proposals = Contest.objects.order_by('id')
     context = {'proposals': proposals}
     return render(request, 'contest/contest_list.html', context)
+
+
+def delete_proposal(request, pk):
+    """Функция удаления заявок."""
+    instance = get_object_or_404(Contest, pk=pk)
+    form = ContestForm(instance=instance)
+    context = {'form': form}
+    if request.method == 'POST':
+        instance.delete()
+        return redirect('contest:list')
+    return render(request, 'contest/form.html', context)
