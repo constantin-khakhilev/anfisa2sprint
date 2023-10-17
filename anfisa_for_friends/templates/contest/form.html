@@ -18,9 +18,12 @@
       </form>
     </div>
   </div>
-  {% if form.is_valid %}
-    <h2>Рецепт мороженого "{{ request.POST.title }}" принят на конкурс!</h2>
-  {% endif %}
+  {% with data=form.instance %}
+    {% if form.is_valid %}
+      <h2>Рецепт мороженого "{{ data.title }}" принят на конкурс!</h2>
+      Номер заявки: {{ data.id }}
+    {% endif %}
+  {% endwith %}
   <hr>
   <div>
     <a href="{% url 'contest:list' %}">Список всех заявок</a>
